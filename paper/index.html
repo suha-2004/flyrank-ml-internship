@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+        content="FlyRank Capstone Research Paper — Search Intelligence and Content Opportunity Ranking">
+
+    <title>Search Intelligence — FlyRank Capstone</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- NAVIGATION -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">FLYRANK<span>.</span></div>
+
+            <div class="nav-links">
+                <a href="#abstract">Abstract</a>
+                <a href="#question">Question</a>
+                <a href="#data">Data</a>
+                <a href="#methodology">Methodology</a>
+                <a href="#results">Results</a>
+                <a href="#recommendations">Recommendations</a>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- HERO -->
+    <header class="hero">
+
+        <div class="hero-content">
+
+            <div class="eyebrow">
+                CAPSTONE RESEARCH • SEARCH INTELLIGENCE
+            </div>
+
+            <h1>
+                Identifying Content
+                <span>Opportunities</span>
+                Before Performance Declines
+            </h1>
+
+            <p class="hero-text">
+                Using historical search and content-performance signals
+                to prioritize pages for human editorial review.
+            </p>
+
+            <div class="hero-buttons">
+                <a href="https://github.com/suha-2004/flyrank-ml-internship/blob/main/work/notebooks/capstone.ipynb" class="button primary">
+                    View Notebook
+                </a>
+
+                <a href="#results" class="button secondary">
+                    Explore Results
+                </a>
+            </div>
+
+        </div>
+
+        <div class="hero-card">
+
+            <div class="card-label">
+                RESEARCH OUTPUT
+            </div>
+
+            <div class="score">
+                Ranked
+            </div>
+
+            <p>
+                Content-opportunity scores with
+                interpretable prioritization reasons.
+            </p>
+
+            <div class="mini-line"></div>
+
+            <span>
+                Decision-support system
+            </span>
+
+        </div>
+
+    </header>
+
+
+    <!-- ABSTRACT -->
+    <section id="abstract" class="section intro-section">
+
+        <div class="section-number">00</div>
+
+        <div class="section-content">
+
+            <p class="section-label">ABSTRACT</p>
+
+            <h2>
+                Turning historical search signals
+                into editorial priorities.
+            </h2>
+
+            <p class="large-text">
+                This study investigates whether historical search and
+                content-performance signals can be used to identify pages
+                that should be prioritized for content review.
+            </p>
+
+            <p>
+                The analysis frames content decline as a binary classification
+                problem. A page is labelled as declining when impressions in
+                the final 30-day period fall below 80% of impressions in the
+                preceding 30-day period.
+            </p>
+
+            <p>
+                A Random Forest model is trained using predictors calculated
+                only from the preceding 30-day period. The final system
+                produces a ranked content-opportunity score intended to help
+                editors focus limited review capacity on higher-risk pages.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- QUESTION -->
+    <section id="question" class="section dark-section">
+
+        <div class="section-number">01</div>
+
+        <div class="section-content">
+
+            <p class="section-label">RESEARCH QUESTION</p>
+
+            <h2>
+                Can historical signals identify
+                pages worth reviewing first?
+            </h2>
+
+            <div class="question-grid">
+
+                <div class="info-card">
+                    <span>QUESTION</span>
+
+                    <p>
+                        Can historical search and content signals be used
+                        to identify pages that should be prioritized for
+                        content review?
+                    </p>
+                </div>
+
+                <div class="info-card">
+                    <span>DECISION</span>
+
+                    <p>
+                        Help editors decide which pages should be reviewed
+                        or refreshed first.
+                    </p>
+                </div>
+
+                <div class="info-card">
+                    <span>UNIT OF ANALYSIS</span>
+
+                    <p>Page.</p>
+                </div>
+
+                <div class="info-card">
+                    <span>OUTPUT</span>
+
+                    <p>
+                        A ranked content-opportunity score with reasons
+                        for prioritization.
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- DATA -->
+    <section id="data" class="section">
+
+        <div class="section-number">02</div>
+
+        <div class="section-content">
+
+            <p class="section-label">DATA</p>
+
+            <h2>
+                Full FlyRank warehouse release.
+            </h2>
+
+            <p>
+                The analysis uses the public-safe FlyRank warehouse release
+                with pseudonymized identifiers.
+            </p>
+
+            <div class="table-card">
+
+                <div class="table-row table-header">
+                    <span>TABLE</span>
+                    <span>ROLE</span>
+                </div>
+
+                <div class="table-row">
+                    <span>dim_clients</span>
+                    <span>Client-level metadata</span>
+                </div>
+
+                <div class="table-row">
+                    <span>dim_content</span>
+                    <span>Content-level metadata</span>
+                </div>
+
+                <div class="table-row">
+                    <span>fact_content_daily_performance</span>
+                    <span>Daily search and engagement performance</span>
+                </div>
+
+                <div class="table-row">
+                    <span>fact_content_query_90d</span>
+                    <span>Query-level search signals</span>
+                </div>
+
+            </div>
+
+            <div class="feature-box">
+
+                <h3>Temporal design</h3>
+
+                <div class="timeline">
+
+                    <div class="timeline-item">
+                        <strong>Previous 30 days</strong>
+                        <span>Predictor features</span>
+                    </div>
+
+                    <div class="timeline-arrow">→</div>
+
+                    <div class="timeline-item">
+                        <strong>Final 30 days</strong>
+                        <span>Outcome / decline label</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="note">
+                Query-level 90-day signals were excluded from the final model
+                because their available window overlaps the outcome period
+                and could introduce leakage.
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- METHODOLOGY -->
+    <section id="methodology" class="section dark-section">
+
+        <div class="section-number">03</div>
+
+        <div class="section-content">
+
+            <p class="section-label">METHODOLOGY</p>
+
+            <h2>
+                Leakage-aware modeling.
+            </h2>
+
+            <div class="method-grid">
+
+                <div class="method-card">
+                    <div class="method-number">01</div>
+                    <h3>Label</h3>
+                    <p>
+                        Final 30-day impressions are compared with
+                        the preceding 30-day period.
+                    </p>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-number">02</div>
+                    <h3>Features</h3>
+                    <p>
+                        Ten predictors are calculated exclusively
+                        from the previous 30-day period.
+                    </p>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-number">03</div>
+                    <h3>Model</h3>
+                    <p>
+                        Random Forest classifier with 300 trees.
+                    </p>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-number">04</div>
+                    <h3>Validation</h3>
+                    <p>
+                        Client-grouped train/test split prevents
+                        client overlap between training and testing.
+                    </p>
+                </div>
+
+            </div>
+
+            <h3 class="subheading">
+                Final predictor features
+            </h3>
+
+            <div class="tag-container">
+
+                <span>Impressions</span>
+                <span>Clicks</span>
+                <span>CTR</span>
+                <span>Average position</span>
+                <span>Position volatility</span>
+                <span>GA4 sessions</span>
+                <span>Engaged sessions</span>
+                <span>Referral sessions</span>
+                <span>AI sessions</span>
+                <span>Engagement rate</span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- RESULTS -->
+    <section id="results" class="section">
+
+        <div class="section-number">04</div>
+
+        <div class="section-content">
+
+            <p class="section-label">RESULTS</p>
+
+            <h2>
+                Random Forest vs baseline.
+            </h2>
+
+            <p>
+                Evaluation was performed on a client-held-out test set.
+                The results are interpreted as ranking and decision-support
+                performance rather than automatic content actions.
+            </p>
+
+            <div class="metrics-grid">
+
+                <div class="metric-card">
+                    <span>BASE RATE</span>
+                    <strong>65.72%</strong>
+                </div>
+
+                <div class="metric-card highlight">
+                    <span>ROC AUC</span>
+                    <strong>0.624</strong>
+                    <small>Random Forest</small>
+                </div>
+
+                <div class="metric-card">
+                    <span>PRECISION @ 20</span>
+                    <strong>90%</strong>
+                </div>
+
+                <div class="metric-card">
+                    <span>PRECISION @ 50</span>
+                    <strong>90%</strong>
+                </div>
+
+                <div class="metric-card">
+                    <span>PRECISION @ 100</span>
+                    <strong>87%</strong>
+                </div>
+
+            </div>
+
+            <div class="comparison">
+
+                <h3>Model comparison</h3>
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Baseline</th>
+                            <th>Random Forest</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>Base rate</td>
+                            <td>65.72%</td>
+                            <td>65.72%</td>
+                        </tr>
+
+                        <tr>
+                            <td>ROC AUC</td>
+                            <td>0.480</td>
+                            <td>0.624</td>
+                        </tr>
+
+                        <tr>
+                            <td>Precision@20</td>
+                            <td>90%</td>
+                            <td>90%</td>
+                        </tr>
+
+                        <tr>
+                            <td>Precision@50</td>
+                            <td>66%</td>
+                            <td>90%</td>
+                        </tr>
+
+                        <tr>
+                            <td>Precision@100</td>
+                            <td>66%</td>
+                            <td>87%</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <p class="interpretation">
+                The Random Forest achieved higher ROC AUC than the simple
+                baseline and improved Precision@50 and Precision@100.
+                These results indicate useful directional ranking performance
+                on the held-out clients.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- FEATURE IMPORTANCE -->
+    <section class="section light-alt">
+
+        <div class="section-number">04A</div>
+
+        <div class="section-content">
+
+            <p class="section-label">MODEL INTERPRETATION</p>
+
+            <h2>
+                What signals mattered most?
+            </h2>
+
+            <div class="importance-list">
+
+                <div class="importance-row">
+                    <span>Average position</span>
+                    <div class="bar">
+                        <div style="width:100%"></div>
+                    </div>
+                    <strong>0.2280</strong>
+                </div>
+
+                <div class="importance-row">
+                    <span>Position volatility</span>
+                    <div class="bar">
+                        <div style="width:91%"></div>
+                    </div>
+                    <strong>0.2076</strong>
+                </div>
+
+                <div class="importance-row">
+                    <span>Impressions</span>
+                    <div class="bar">
+                        <div style="width:81%"></div>
+                    </div>
+                    <strong>0.1845</strong>
+                </div>
+
+                <div class="importance-row">
+                    <span>CTR</span>
+                    <div class="bar">
+                        <div style="width:57%"></div>
+                    </div>
+                    <strong>0.1293</strong>
+                </div>
+
+                <div class="importance-row">
+                    <span>GA4 sessions</span>
+                    <div class="bar">
+                        <div style="width:56%"></div>
+                    </div>
+                    <strong>0.1278</strong>
+                </div>
+
+                <div class="importance-row">
+                    <span>Clicks</span>
+                    <div class="bar">
+                        <div style="width:23%"></div>
+                    </div>
+                    <strong>0.0516</strong>
+                </div>
+
+            </div>
+
+            <p class="small-note">
+                Feature importance represents model association, not causal
+                importance.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- LIMITATIONS -->
+    <section id="limitations" class="section dark-section">
+
+        <div class="section-number">05</div>
+
+        <div class="section-content">
+
+            <p class="section-label">LIMITATIONS</p>
+
+            <h2>
+                What this analysis cannot claim.
+            </h2>
+
+            <div class="limitations">
+
+                <div>
+                    <span>01</span>
+                    <p>
+                        The model identifies statistical associations and
+                        does not establish causal relationships.
+                    </p>
+                </div>
+
+                <div>
+                    <span>02</span>
+                    <p>
+                        A decline in impressions does not necessarily mean
+                        that a page requires a content refresh.
+                    </p>
+                </div>
+
+                <div>
+                    <span>03</span>
+                    <p>
+                        The 20% decline threshold affects the definition
+                        of the outcome.
+                    </p>
+                </div>
+
+                <div>
+                    <span>04</span>
+                    <p>
+                        Performance may differ on future data or clients
+                        with different characteristics.
+                    </p>
+                </div>
+
+                <div>
+                    <span>05</span>
+                    <p>
+                        Recommendations are decision-support outputs and
+                        should not automatically trigger content changes.
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- RECOMMENDATIONS -->
+    <section id="recommendations" class="section">
+
+        <div class="section-number">06</div>
+
+        <div class="section-content">
+
+            <p class="section-label">RANKED RECOMMENDATIONS</p>
+
+            <h2>
+                From model score to editorial action.
+            </h2>
+
+            <p>
+                Higher scores indicate higher estimated risk of subsequent
+                impression decline. The ranking is designed to focus human
+                review capacity.
+            </p>
+
+            <div class="action-grid">
+
+                <div class="action-card priority-high">
+                    <span>≥ 0.90</span>
+                    <h3>High-priority review</h3>
+                    <p>
+                        Pages with the highest estimated risk.
+                    </p>
+                </div>
+
+                <div class="action-card">
+                    <span>0.75–0.89</span>
+                    <h3>Review</h3>
+                    <p>
+                        Pages worth examining during the normal review cycle.
+                    </p>
+                </div>
+
+                <div class="action-card">
+                    <span>0.50–0.74</span>
+                    <h3>Monitor</h3>
+                    <p>
+                        Pages that may warrant additional observation.
+                    </p>
+                </div>
+
+                <div class="action-card">
+                    <span>&lt; 0.50</span>
+                    <h3>Lower priority</h3>
+                    <p>
+                        Lower estimated risk relative to other pages.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="recommendation-preview">
+
+                <h3>Top-ranked opportunities</h3>
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Model score</th>
+                            <th>Reason</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>1</td>
+                            <td>1.000</td>
+                            <td>Weak position; high volatility</td>
+                            <td>High-priority review</td>
+                        </tr>
+
+                        <tr>
+                            <td>2</td>
+                            <td>0.993</td>
+                            <td>Weak position; high volatility</td>
+                            <td>High-priority review</td>
+                        </tr>
+
+                        <tr>
+                            <td>3</td>
+                            <td>0.990</td>
+                            <td>Weak position; high volatility</td>
+                            <td>High-priority review</td>
+                        </tr>
+
+                        <tr>
+                            <td>4</td>
+                            <td>0.990</td>
+                            <td>High volatility; low CTR</td>
+                            <td>High-priority review</td>
+                        </tr>
+
+                        <tr>
+                            <td>5</td>
+                            <td>0.990</td>
+                            <td>Weak position; high volatility</td>
+                            <td>High-priority review</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ARTIFACTS -->
+    <section class="section dark-section">
+
+        <div class="section-number">07</div>
+
+        <div class="section-content">
+
+            <p class="section-label">ARTIFACTS</p>
+
+            <h2>
+                Reproducible outputs.
+            </h2>
+
+            <div class="artifact-grid">
+
+                <div class="artifact">
+                    <span>01</span>
+                    <h3>Model comparison</h3>
+                    <p>
+                        Baseline and Random Forest evaluation.
+                    </p>
+                </div>
+
+                <div class="artifact">
+                    <span>02</span>
+                    <h3>Feature importance</h3>
+                    <p>
+                        Relative contribution of model predictors.
+                    </p>
+                </div>
+
+                <div class="artifact">
+                    <span>03</span>
+                    <h3>Score distribution</h3>
+                    <p>
+                        Distribution of model opportunity scores.
+                    </p>
+                </div>
+
+                <div class="artifact">
+                    <span>04</span>
+                    <h3>Ranked recommendations</h3>
+                    <p>
+                        Full ranked content-opportunity dataset.
+                    </p>
+                </div>
+
+                <div class="artifact">
+                    <span>05</span>
+                    <h3>Error analysis</h3>
+                    <p>
+                        False positives and false negatives.
+                    </p>
+                </div>
+
+                <div class="artifact">
+                    <span>06</span>
+                    <h3>Notebook</h3>
+                    <p>
+                        Complete analysis workflow.
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="charts">
+
+            <div class="chart-card">
+                <h3>Feature Importance</h3>
+                <img src="capstone_feature_importance.png" alt="Random Forest Feature Importance">
+            </div>
+
+            <div class="chart-card">
+                <h3>Model Score Distribution</h3>
+                <img src="capstone_score_distribution.png" alt="Distribution of Model Opportunity Scores">
+            </div>
+
+            <div class="chart-card">
+                <h3>Top 20 Content Opportunities</h3>
+                <img src="capstone_top20_recommendations.png" alt="Top 20 Ranked Content Opportunities">
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ML-12 -->
+    <section class="section">
+
+        <div class="section-number">08</div>
+
+        <div class="section-content">
+
+            <p class="section-label">ML-12 / COMMUNICATION</p>
+
+            <h2>
+                Explain the project in five minutes.
+            </h2>
+
+            <div class="demo-grid">
+
+                <div>
+                    <strong>01 — Problem</strong>
+                    <p>
+                        Identify pages that should be prioritized for
+                        content review.
+                    </p>
+                </div>
+
+                <div>
+                    <strong>02 — Data</strong>
+                    <p>
+                        Historical search and engagement performance
+                        from the FlyRank warehouse.
+                    </p>
+                </div>
+
+                <div>
+                    <strong>03 — Method</strong>
+                    <p>
+                        Leakage-safe features, client-held-out validation,
+                        and Random Forest classification.
+                    </p>
+                </div>
+
+                <div>
+                    <strong>04 — Results</strong>
+                    <p>
+                        ROC AUC of 0.624 with strong top-K ranking
+                        performance on the held-out set.
+                    </p>
+                </div>
+
+                <div>
+                    <strong>05 — Decision</strong>
+                    <p>
+                        Use ranked scores as human decision support
+                        for editorial review.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="social-card">
+
+                <p class="section-label">SOCIAL-POST CUT</p>
+
+                <p>
+                    Built a leakage-aware search-intelligence model that
+                    ranks content pages by estimated risk of future
+                    impression decline. Using historical performance
+                    signals and client-held-out validation, the Random
+                    Forest achieved a ROC AUC of 0.624 and 90% Precision@50.
+                    The output is designed as editorial decision support,
+                    not automatic content action.
+                </p>
+
+            </div>
+
+            <div class="employer-card">
+
+                <p class="section-label">EMPLOYER SUMMARY</p>
+
+                <p>
+                    I built a leakage-aware machine-learning pipeline to
+                    identify pages at risk of future search-performance
+                    decline. I engineered temporal features, used
+                    client-grouped validation, compared the model against
+                    a baseline, and produced ranked recommendations with
+                    interpretable reason codes. The final system turns
+                    model predictions into a practical decision-support
+                    workflow for content review.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ACKNOWLEDGMENTS -->
+    <footer class="footer">
+
+        <div class="footer-inner">
+
+            <div>
+                <div class="logo">FLYRANK<span>.</span></div>
+
+                <p>
+                    Capstone research paper on search intelligence,
+                    content performance, and decision-support ranking.
+                </p>
+            </div>
+
+            <div class="footer-links">
+
+                <a href="https://flyrank.ai" target="_blank" rel="noopener noreferrer">
+                    FlyRank
+                </a>
+
+                <a href="../work/notebooks/capstone.ipynb">
+                    Notebook
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="acknowledgment">
+
+            <p class="section-label">
+                ACKNOWLEDGMENTS & DATA CREDIT
+            </p>
+
+            <p>
+                This capstone uses the FlyRank internship warehouse release
+                and follows the public-safe and leakage-aware constraints
+                specified for the assignment.
+            </p>
+
+            <p>
+                Data credit:
+                <a href="https://flyrank.ai" target="_blank" rel="noopener noreferrer">
+                    flyrank.ai
+                </a>
+            </p>
+
+        </div>
+
+        <div class="footer-bottom">
+            <span>FlyRank Capstone</span>
+            <span>Search Intelligence • 2026</span>
+        </div>
+
+    </footer>
+
+
+</body>
+
+</html>
